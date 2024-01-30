@@ -15,14 +15,26 @@ def random_captcha():
 
 # 生成字符对应的验证码
 def gen_captcha_text_and_image():
-    image = ImageCaptcha()
+    image = ImageCaptcha(width=captcha_setting.IMAGE_WIDTH, 
+                         height=captcha_setting.IMAGE_HEIGHT, 
+                         fonts=["C:\\Windows\\Fonts\\msyhl.ttc"], 
+                         font_sizes=(35,)
+                         )
     captcha_text = random_captcha()
-    captcha_image = Image.open(image.generate(captcha_text))
+    captcha_image = Image.open(image.generate(captcha_text)).convert('RGBA')
+
+    W, L = captcha_image.size
+    white_pixel = (255, 255, 255, 255)  # 白色
+    for h in range(W):
+        for i in range(L):
+            if captcha_image.getpixel((h, i)) == white_pixel:
+                captcha_image.putpixel((h, i), (0, 0, 0, 0))   # 设置透明
+
     return captcha_text, captcha_image
 
 if __name__ == '__main__':
-    count = 30
-    path = captcha_setting.TRAIN_DATASET_PATH    #通过改变此处目录，以生成 训练、测试和预测用的验证码集
+    count = 1000
+    path = captcha_setting.TEST_DATASET_PATH    #通过改变此处目录，以生成 训练、测试和预测用的验证码集
     if not os.path.exists(path):
         os.makedirs(path)
     for i in range(count):
