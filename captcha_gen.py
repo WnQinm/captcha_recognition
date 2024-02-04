@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from captcha.image import ImageCaptcha  # pip install captcha
+from captcha.image import ImageCaptcha
 from PIL import Image
 import random
 import time
@@ -17,19 +17,11 @@ def random_captcha():
 def gen_captcha_text_and_image():
     image = ImageCaptcha(width=captcha_setting.IMAGE_WIDTH, 
                          height=captcha_setting.IMAGE_HEIGHT, 
-                         fonts=["C:\\Windows\\Fonts\\msyhl.ttc"], 
-                         font_sizes=(35,)
+                         fonts=["C:\\Windows\\Fonts\\msyhl.ttc", "C:\\Windows\\Fonts\\corbell.ttf", "C:\\Windows\\Fonts\\corbelli.ttf", "C:\\Windows\\Fonts\\segoeuil.ttf", "C:\\Windows\\Fonts\\seguili.ttf", "C:\\Windows\\Fonts\\STXIHEI.TTF"], 
+                         font_sizes=(30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40)
                          )
     captcha_text = random_captcha()
-    captcha_image = Image.open(image.generate(captcha_text)).convert('RGBA')
-
-    W, L = captcha_image.size
-    white_pixel = (255, 255, 255, 255)  # 白色
-    for h in range(W):
-        for i in range(L):
-            if captcha_image.getpixel((h, i)) == white_pixel:
-                captcha_image.putpixel((h, i), (0, 0, 0, 0))   # 设置透明
-
+    captcha_image = Image.open(image.generate(captcha_text)).convert('RGB')
     return captcha_text, captcha_image
 
 if __name__ == '__main__':

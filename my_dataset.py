@@ -18,7 +18,7 @@ class mydataset(Dataset):
     def __getitem__(self, idx):
         image_root = self.train_image_file_paths[idx]
         image_name = image_root.split(os.path.sep)[-1]
-        image = Image.open(image_root)
+        image = Image.open(image_root).convert("RGB")
         if self.transform is not None:
             image = self.transform(image)
         label = ohe.encode(image_name.split('_')[0]) # 为了方便，在生成图片的时候，图片文件的命名格式 "4个数字或者数字_时间戳.PNG", 4个字母或者即是图片的验证码的值，字母大写,同时对该值做 one-hot 处理
@@ -26,7 +26,7 @@ class mydataset(Dataset):
 
 transform = transforms.Compose([
     # transforms.ColorJitter(),
-    transforms.Grayscale(),
+    # transforms.Grayscale(),
     transforms.ToTensor(),
     # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
@@ -39,6 +39,32 @@ def get_test_data_loader():
     dataset = mydataset(captcha_setting.TEST_DATASET_PATH, transform=transform)
     return DataLoader(dataset, batch_size=1, shuffle=True)
 
+
+class predictdataset(Dataset):
+
+    def __init__(self, folder, transform):
+        self.train_image_file_paths = [os.path.join(folder, image_file) for image_file in os.listdir(folder)]
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.train_image_file_paths)
+
+    def __getitem__(self, idx):
+        image_root = self.train_image_file_paths[idx]
+        image_name = image_root.split(os.path.sep)[-1]
+
+        image = Image.open(image_root).convert("RGBA")
+        W, L = image.size
+        for h in range(W):
+            for i in range(L):
+                if image.getpixel((h, i))[-1] == 0:
+                    image.putpixel((h, i), (255, 255, 255, 255))
+        
+        image = transform(image.convert("RGB"))
+        label = ohe.encode(image_name.split('.')[0])
+        return image, label
+
+
 def get_predict_data_loader():
-    dataset = mydataset(captcha_setting.PREDICT_DATASET_PATH, transform=transform)
+    dataset = predictdataset(captcha_setting.PREDICT_DATASET_PATH, transform=transform)
     return DataLoader(dataset, batch_size=1, shuffle=True)

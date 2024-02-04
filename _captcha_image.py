@@ -11,7 +11,7 @@ import random
 import typing as t
 from PIL.Image import new as createImage, Image, QUAD, BILINEAR
 from PIL.ImageDraw import Draw, ImageDraw
-from PIL.ImageFilter import SMOOTH
+from PIL.ImageFilter import SHARPEN
 from PIL.ImageFont import FreeTypeFont, truetype
 from io import BytesIO
 
@@ -71,6 +71,7 @@ class ImageCaptcha:
 
     @staticmethod
     def create_noise_curve(image: Image, color: ColorTuple) -> Image:
+        color = random_color(10, 200, random.randint(220, 255))
         w, h = image.size
         x1 = random.randint(0, int(w / 5))
         x2 = random.randint(w - int(w / 5), w)
@@ -81,6 +82,7 @@ class ImageCaptcha:
         start = random.randint(0, 20)
         Draw(image).arc(points, start, end, fill=color)
 
+        color = random_color(10, 200, random.randint(220, 255))
         w, h = image.size
         x1 = random.randint(0, int(w / 5))
         x2 = random.randint(w - int(w / 5), w)
@@ -91,6 +93,7 @@ class ImageCaptcha:
         start = random.randint(0, 20)
         Draw(image).arc(points, start, end, fill=color)
 
+        color = random_color(10, 200, random.randint(220, 255))
         w, h = image.size
         x1 = random.randint(0, int(w / 5))
         x2 = random.randint(w - int(w / 5), w)
@@ -208,9 +211,9 @@ class ImageCaptcha:
         background = (255, 255, 255)
         color = random_color(10, 200, random.randint(220, 255))
         im = self.create_captcha_image(chars, color, background)
-        # self.create_noise_dots(im, color)
+        self.create_noise_dots(im, color)
         self.create_noise_curve(im, color)
-        # im = im.filter(SMOOTH)
+        # im = im.filter(SHARPEN)
         return im
 
     def generate(self, chars: str, format: str = 'png') -> BytesIO:
